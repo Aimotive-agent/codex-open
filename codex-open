@@ -1,0 +1,24 @@
+#!/bin/bash
+# codex-open — run Codex against any provider from config.toml.
+#
+#   codex-open deepseek deepseek-chat "write a haiku"
+#   codex-open lmstudio liquid/lfm2.5-1.2b "explain this repo"
+#   codex-open ollama  llama3.2:1b  "explain this repo"   # built-in, --oss
+set -euo pipefail
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[ -e ~/.codex/config.toml ] || ln -sf "$DIR/config.toml" ~/.codex/config.toml
+
+if [ "$#" -lt 2 ]; then
+  echo "usage: codex-open <provider> <model> [prompt...]" >&2
+  echo "providers: $(grep -oE '^\[model_providers\.[a-z0-9-]+' "$DIR/config.toml" | sed 's/\[model_providers\.//' | tr '\n' ' ') lmstudio ollama (built-in)" >&2
+  exit 1
+fi
+
+provider="$1"; model="$2"; shift 2
+
+case "$provider" in
+  ollama) exec codex exec --oss --local-provider ollama -m "$model" "$@" ;;
+  lmstudio) exec codex exec --oss --local-provider lmstudio -m "$model" "$@" ;;
+  *) exec codex exec -c "model_provider=$provider" -m "$model" "$@" ;;
+esac

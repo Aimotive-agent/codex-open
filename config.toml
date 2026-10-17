@@ -1,0 +1,28 @@
+# Codex providers — our multi-provider config.
+# Wire API note: only `responses` is supported (`chat` was removed in Feb 2026).
+# Local built-ins (no config needed): `codex --oss --local-provider lmstudio|ollama`.
+
+# Default: OmniRoute (our gateway) → DeepSeek V4 Pro.
+# NOTE: `auto` / `auto/best-coding` currently route to the deprecated Claude
+# Opus 4.6 via "last known good provider" — use an explicit model until OmniRoute's
+# routing is refreshed.
+model_provider = "omniroute"
+model = "deepseek/deepseek-v4-pro"
+
+[model_providers.omniroute]
+name = "OmniRoute"
+base_url = "https://omniroute.veritasglobalai.com/v1"
+experimental_bearer_token = "omniroute"
+wire_api = "responses"
+
+[model_providers.deepseek]
+name = "DeepSeek (direct)"
+base_url = "https://api.deepseek.com/v1"
+env_key = "DEEPSEEK_API_KEY"
+wire_api = "responses"
+
+[model_providers.orcarouter]
+name = "OrcaRouter"
+base_url = "https://api.orcarouter.ai/v1"
+env_key = "ORCAROUTER_API_KEY"
+wire_api = "responses"
